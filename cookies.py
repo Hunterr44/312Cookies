@@ -3,10 +3,7 @@ import asyncio
 from playwright.async_api import async_playwright
 import json
 
-# Load top 500 websites from CSV
 df = pd.read_csv("Well_Formed_Domain_Data.csv")
-
-# Extract domain list
 domains = df["Root Domain"].dropna().tolist()
 print(domains)
 
@@ -35,9 +32,7 @@ async def main():
         domain, cookies = await scrape_cookies(domain)
         results.append({"domain": domain, "cookies": cookies})
     
-    # Save results to a JSON file
     with open("cookies_output.json", "w") as f:
         json.dump(results, f, indent=2)
 
-# Run the async script
 asyncio.run(main())
