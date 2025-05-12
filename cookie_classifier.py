@@ -15,14 +15,14 @@ bad = 2
 neutral = 1
 fine = 0
 
-secure_m = 1
-httpOnly_m = 1
-cookieDomain_m = 1
-path_m = 1
-expires_m = 1
-sameSite_m = 1
+secure_m = 3 # can be intercepted by unknown 3rd party and HTTPS data sending is standard protocal --- this violates said standard
+httpOnly_m = 2 # can allow local scripting to access, vulnerable to leakage attacks and user virus
+cookieDomain_m = 3 # allows sharing with 3rd party - opens door to data privacy risks 
+path_m = 1 # generally covered by other categories such as __HOST; internal issues are less problematic than external domain vulnerability
+expires_m = 1 # low priority
+sameSite_m = 2 # generally want to limit scope of data sharing; but none can be useful sometimes, but our data will not have instances where none is beneficial (SSO login etc)
 
-dt = datetime(2025, 4, 22, 23, 0, 0, tzinfo=timezone.utc)
+dt = datetime(2025, 4, 22, 23, 0, 0, tzinfo=timezone.utc) # completion time of runnning
 creation_time = dt.timestamp()
 print(creation_time)
 
@@ -48,8 +48,16 @@ for _,main_domain in cookies_df.iterrows():
 
     for cookie in main_domain["cookies"]:
         #print(cookie)
-        if("error" in cookie): # if no actual cookie data then just go to next cookie
+        if("error" in cookie): # if error getting cookie data then just go to next cookie
+            if(cookie_index == 0):
+                data[domain_index].append([-1])
+            else:
+                #print(data)
+                data[domain_index][1].append(-1)
+            cookie_index+=1
             continue
+        
+        
         score = 0
         
         if(cookie["secure"] == False): #if change the min from 0, add the other conditions
