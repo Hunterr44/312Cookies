@@ -140,10 +140,10 @@ def score_cookies(domain: str, cookies: list) -> list:
             score += bad * path_m
 
         expires = cookie.get("expires", 0)
-        time_diff = expires - CREATION_TIME
-        if time_diff > ONE_MONTH:
+        time_diff = expires - time.time()
+        if time_diff > one_month:
             score += bad * expires_m
-        elif time_diff > ONE_WEEK:
+        elif time_diff > one_week:
             score += neutral * expires_m
 
         if cookie.get("sameSite") == "None":
