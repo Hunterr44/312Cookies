@@ -10,10 +10,8 @@ import matplotlib.pyplot as plt
 
 from cookies import scrape_cookies
 from cookie_classifier import score_cookies
-import asyncio
 
-import os
-os.system("sudo playwright install-deps")
+import requests
 
 
 
@@ -293,36 +291,22 @@ elif page == "Website Checker":
     run_check = st.button("Check Cookies")
 
     if run_check and user_url:
-        with st.spinner("Scraping cookies..."):
+        domain = user_url.replace("https://", "").replace("http://", "").split("/")[0]
+
+        with st.spinner("Fetching cookies..."):
             try:
-                domain = user_url.replace("https://", "").replace("http://", "").split("/")[0]
-                domain, cookies = asyncio.run(scrape_cookies(domain))
+                api_url = "https://three12cookieapi-1.onrender.com"
+                response = requests.get(api_url, params={"domain": domain})
+                data = response.json()
 
-                if isinstance(cookies, dict) and "error" in cookies:
-                    st.error(f"Failed to fetch cookies: {cookies['error']}")
+                if "error" in data:
+                    st.error(f"Error: {data['error']}")
                 else:
-                    st.success(f"Cookies fetched for {domain}")
-                    st.json(cookies)
-                    scores = score_cookies(domain, cookies)
-                    def cat(score):
-                        if score <= 8:
-                            return "Good"
-                        elif score <= 14:
-                            return "Moderate"
-                        else:
-                            return "Bad"
-                    summary = {"Good": 0, "Moderate": 0, "Bad": 0}
-                    for s in scores:
-                        summary[cat(s)] += 1
+                    st.success(f"Cookies from {domain}")
+                    st.json(data["cookies"])
 
-                    st.subheader("Cookie Risk Scores")
-                    st.write("Individual Scores:", scores)
-                    st.write("Summary:", summary)
-
-                    fig, ax = plt.subplots()
-                    ax.pie(summary.values(), labels=summary.keys(), autopct='%1.1f%%')
-                    ax.set_title("Cookie Risk Classification")
-                    st.pyplot(fig)
+                    scores = score_cookies(domain, data["cookies"])
+                    st.write("Scores:", scores)
 
             except Exception as e:
-                st.error(f"Error occurred: {str(e)}")
+                st.error(f"Something went wrong: {str(e)}")
