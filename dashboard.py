@@ -8,6 +8,9 @@ from datetime import datetime, timezone
 from collections import Counter
 import matplotlib.pyplot as plt
 
+from cookies import scrape_cookies
+from cookie_classifier import score_cookies
+import asyncio
 
 
 
@@ -279,3 +282,46 @@ elif page == "Per-Domain Data":
             plot_stacked_bar(same, "SameSite Attribute", samesite_colors, samesite_order)
         else:
             st.write("No cookie data available for this domain.")
+elif page == "Website Checker":
+    st.subheader("Check Cookies for a Specific Website")
+
+    user_url = st.text_input("Enter a full URL (e.g., https://example.com):")
+    run_check = st.button("Check Cookies")
+
+    if run_check and user_url:
+        with st.spinner("Scraping cookies..."):
+            try:
+                domain = user_url.replace("https://", "").replace("http://", "").split("/")[0]
+                domain, cookies = asyncio.run(scrape_cookies(domain))
+
+                if isinstance(cookies, dict) and "error" in cookies:
+                    st.error(f"Failed to fetch cookies: {cookies['error']}")
+                else:
+                    st.success(f"Cookies fetched for {domain}")
+                    st.json(cookies)
+
+                    scores = score_cookies(domain, cookies)
+
+
+                    def cat(score):
+                        if score <= 8:
+                            return "Good"
+                        elif score <= 14:
+                            return "Moderate"
+                        else:
+                            return "Bad"
+                    summary = {"Good": 0, "Moderate": 0, "Bad": 0}
+                    for s in scores:
+                        summary[cat(s)] += 1
+
+                    st.subheader("Cookie Risk Scores")
+                    st.write("Individual Scores:", scores)
+                    st.write("Summary:", summary)
+
+                    fig, ax = plt.subplots()
+                    ax.pie(summary.values(), labels=summary.keys(), autopct='%1.1f%%')
+                    ax.set_title("Cookie Risk Classification")
+                    st.pyplot(fig)
+
+            except Exception as e:
+                st.error(f"Error occurred: {str(e)}")
