@@ -282,51 +282,52 @@ elif page == "Per-Domain Data":
             plot_stacked_bar(same, "SameSite Attribute", samesite_colors, samesite_order)
         else:
             st.write("No cookie data available for this domain.")
-elif page == "Website Checker":
-    st.subheader("Check Cookies for a Specific Website")
 
-    user_url = st.text_input("Enter a full URL (e.g., https://example.com):")
-    run_check = st.button("Check Cookies")
+# elif page == "Website Checker":
+#     st.subheader("Check Cookies for a Specific Website")
 
-    if run_check and user_url:
-        with st.spinner("Scraping cookies..."):
-            try:
-                domain = user_url.replace("https://", "").replace("http://", "").split("/")[0]
-                domain, cookies = asyncio.run(scrape_cookies(domain))
+#     user_url = st.text_input("Enter a full URL (e.g., https://example.com):")
+#     run_check = st.button("Check Cookies")
 
-                if "error" in cookies:
-                    st.error(f"Failed to fetch cookies: {cookies['error']}")
-                else:
-                    st.success(f"Cookies fetched for {domain}")
-                    st.subheader("Raw Cookie Data")
-                    st.json(cookies)
+#     if run_check and user_url:
+#         with st.spinner("Scraping cookies..."):
+#             try:
+#                 domain = user_url.replace("https://", "").replace("http://", "").split("/")[0]
+#                 domain, cookies = asyncio.run(scrape_cookies(domain))
 
-                    scores = score_cookies(domain, cookies)
+#                 if "error" in cookies:
+#                     st.error(f"Failed to fetch cookies: {cookies['error']}")
+#                 else:
+#                     st.success(f"Cookies fetched for {domain}")
+#                     st.subheader("Raw Cookie Data")
+#                     st.json(cookies)
 
-                    def categorize(score):
-                        if score <= 8:
-                            return "Good"
-                        elif score <= 14:
-                            return "Moderate"
-                        else:
-                            return "Bad"
+#                     scores = score_cookies(domain, cookies)
 
-                    categories = [categorize(s) for s in scores]
-                    score_summary = {
-                        "Good": categories.count("Good"),
-                        "Moderate": categories.count("Moderate"),
-                        "Bad": categories.count("Bad")
-                    }
+#                     def categorize(score):
+#                         if score <= 8:
+#                             return "Good"
+#                         elif score <= 14:
+#                             return "Moderate"
+#                         else:
+#                             return "Bad"
 
-                    st.subheader("Cookie Risk Scores")
-                    st.write("Individual Cookie Scores:", scores)
-                    st.write("Summary:", score_summary)
+#                     categories = [categorize(s) for s in scores]
+#                     score_summary = {
+#                         "Good": categories.count("Good"),
+#                         "Moderate": categories.count("Moderate"),
+#                         "Bad": categories.count("Bad")
+#                     }
 
-                    # Optional: Pie chart
-                    fig, ax = plt.subplots()
-                    ax.pie(score_summary.values(), labels=score_summary.keys(), autopct='%1.1f%%')
-                    ax.set_title("Risk Classification")
-                    st.pyplot(fig)
+#                     st.subheader("Cookie Risk Scores")
+#                     st.write("Individual Cookie Scores:", scores)
+#                     st.write("Summary:", score_summary)
 
-            except Exception as e:
-                st.error(f"Error occurred: {str(e)}")
+#                     # Optional: Pie chart
+#                     fig, ax = plt.subplots()
+#                     ax.pie(score_summary.values(), labels=score_summary.keys(), autopct='%1.1f%%')
+#                     ax.set_title("Risk Classification")
+#                     st.pyplot(fig)
+
+#             except Exception as e:
+#                 st.error(f"Error occurred: {str(e)}")
