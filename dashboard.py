@@ -7,9 +7,7 @@ import json
 from datetime import datetime, timezone
 from collections import Counter
 import matplotlib.pyplot as plt
-from cookie_classifier import score_cookies
-from cookies import scrape_cookies  
-import asyncio
+
 
 
 
