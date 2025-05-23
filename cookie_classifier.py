@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timezone
 import json
+import time
 
 cookies_df = pd.read_json("cookies_output.json")
 #print(cookies_df.head(5))
@@ -107,6 +108,50 @@ for _,main_domain in cookies_df.iterrows():
     domain_index+=1
 
 #print(data)
+def score_cookies(domain: str, cookies: list) -> list:
+    scores = []
+
+    for cookie in cookies:
+        if "error" in cookie:
+            scores.append(-1)
+            continue
+
+        score = 0
+
+        if not cookie.get("secure", False):
+            score += bad * secure_m
+
+        if not cookie.get("httpOnly", False):
+            score += bad * httpOnly_m
+
+        cookie_domain = cookie.get("domain", "")
+        if cookie_domain:
+            if cookie_domain == domain:
+                score += neutral * cookieDomain_m
+            else:
+                stripped_cookie_domain = cookie_domain.replace("www.", "")
+                stripped_domain = domain.replace("www.", "")
+                if stripped_cookie_domain == stripped_domain:
+                    score += neutral * cookieDomain_m
+                else:
+                    score += bad * cookieDomain_m
+
+        if cookie.get("path", "") == "/" and "__Host" not in cookie.get("name", ""):
+            score += bad * path_m
+
+        expires = cookie.get("expires", 0)
+        time_diff = expires - CREATION_TIME
+        if time_diff > ONE_MONTH:
+            score += bad * expires_m
+        elif time_diff > ONE_WEEK:
+            score += neutral * expires_m
+
+        if cookie.get("sameSite") == "None":
+            score += bad * sameSite_m
+
+        scores.append(score)
+
+    return scores
 
 with open('2025-05-11_test_all.json', 'w') as f:
     json.dump(data, f, indent = 4)
