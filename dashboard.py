@@ -303,36 +303,37 @@ elif page == "Website Checker":
                     st.error(f"Error: {data['error']}")
                 else:
                     st.success(f"Cookies from {domain}")
-                    st.json(data["cookies"])
+                    #st.json(data["cookies"])
 
-                    # Score and display results
                     scores = score_cookies(domain, data["cookies"])
-                    st.write("Scores:", scores)
+                    #st.write("Scores:", scores)
 
-                    # Pie chart visualization
-                    score_counts = categorize_scores(scores)
-                    pie_labels = list(score_counts.keys())
-                    pie_values = list(score_counts.values())
+                    col1, col2 = st.columns([1, 2])
 
-                    fig1, ax1 = plt.subplots(figsize=(3, 3))
-                    wedges, _ = ax1.pie(
-                        pie_values,
-                        labels=None,
-                        startangle=90,
-                        colors=pie_colors,
-                        wedgeprops=dict(width=0.3, edgecolor='white')
-                    )
-                    ax1.set(aspect="equal")
-                    ax1.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
-                    st.pyplot(fig1)
+                    with col1:
+                        score_counts = categorize_scores(scores)
+                        pie_labels = list(score_counts.keys())
+                        pie_values = list(score_counts.values())
 
-                    # Attribute breakdowns
-                    fetched_data = [{"domain": domain, "cookies": data["cookies"]}]
-                    exp, http, sec, same = get_metrics(fetched_data)
-                    plot_stacked_bar(exp, "Expiration Duration", expiration_colors, expiration_order)
-                    plot_stacked_bar(http, "HttpOnly Flag", http_only_colors, http_only_order)
-                    plot_stacked_bar(sec, "Secure Flag", secure_colors, secure_order)
-                    plot_stacked_bar(same, "SameSite Attribute", samesite_colors, samesite_order)
+                        fig, ax = plt.subplots(figsize=(3, 3))
+                        wedges, _ = ax.pie(
+                            pie_values,
+                            labels=None,
+                            startangle=90,
+                            colors=pie_colors,
+                            wedgeprops=dict(width=0.3, edgecolor='white')
+                        )
+                        ax.set(aspect="equal")
+                        ax.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
+                        st.pyplot(fig)
+
+                    with col2:
+                        fetched_data = [{"domain": domain, "cookies": data["cookies"]}]
+                        exp, http, sec, same = get_metrics(fetched_data)
+                        plot_stacked_bar(exp, "Expiration Duration", expiration_colors, expiration_order)
+                        plot_stacked_bar(http, "HttpOnly Flag", http_only_colors, http_only_order)
+                        plot_stacked_bar(sec, "Secure Flag", secure_colors, secure_order)
+                        plot_stacked_bar(same, "SameSite Attribute", samesite_colors, samesite_order)
 
             except Exception as e:
                 st.error(f"Something went wrong: {str(e)}")
