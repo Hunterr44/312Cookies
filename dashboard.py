@@ -295,7 +295,7 @@ elif page == "Website Checker":
 
         with st.spinner("Fetching cookies..."):
             try:
-                api_url = "https://three12cookieapi-1.onrender.com"
+                api_url = "https://three12cookieapi-1.onrender.com/scrape"
                 response = requests.get(api_url, params={"domain": domain}, timeout=60)
                 data = response.json()
 
