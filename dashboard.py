@@ -13,7 +13,7 @@ from cookie_classifier import score_cookies
 import asyncio
 
 import os
-os.system("playwright install chromium")
+os.system("sudo playwright install-deps")
 
 
 
