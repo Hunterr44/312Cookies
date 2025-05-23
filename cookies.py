@@ -35,4 +35,4 @@ async def main():
     with open("cookies_output.json", "w") as f:
         json.dump(results, f, indent=2)
 
-asyncio.run(main())
+#asyncio.run(main())
