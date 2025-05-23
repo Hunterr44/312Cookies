@@ -12,6 +12,9 @@ from cookies import scrape_cookies
 from cookie_classifier import score_cookies
 import asyncio
 
+import os
+os.system("playwright install --with-deps")
+
 
 
 # ----- PAGE NAVIGATION ----- #
