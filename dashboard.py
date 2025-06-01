@@ -347,7 +347,7 @@ elif page == "Website Checker":
 
 elif page == "Data Explanation":
 
-    st.write("DEBUG - reached data explanation page")
+    #st.write("DEBUG - reached data explanation page")
 
     st.subheader("Expiration Duration")
     st.markdown("""
