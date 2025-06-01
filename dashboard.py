@@ -231,18 +231,19 @@ if page == "Visual Summary":
             domain = domain_entry["domain"]
             cookies = domain_entry["cookies"]
             all_cookies = next((d["cookies"] for d in cookie_data if d["domain"] == domain), [])
-            if cookies:
-                st.markdown(f"### {domain} ({len(cookies)}/{len(all_cookies)})")
-                for cookie in cookies:
-                    name = cookie.get("name", "(Unnamed Cookie)")
-                    exp_days = round((cookie.get("expires", 0) - CREATION_TIME) / (60 * 60 * 24))
-                    st.markdown(f"""
-                    **{name}**  
-                    **Expiration Duration:** {exp_days} days  
-                    **HttpOnly Flag:** {cookie.get("httpOnly", False)}  
-                    **Secure Flag:** {cookie.get("secure", False)}  
-                    **SameSite Attribute:** {cookie.get("sameSite", "Unknown")}  
-                    """)
+            st.markdown(f"### {domain} ({len(cookies)}/{len(all_cookies)})")
+            if not cookies:
+                st.write("No cookies.")
+            for cookie in cookies:
+                name = cookie.get("name", "(Unnamed Cookie)")
+                exp_days = round((cookie.get("expires", 0) - CREATION_TIME) / (60 * 60 * 24))
+                st.markdown(f"""
+                **{name}**  
+                **Expiration Duration:** {exp_days} days  
+                **HttpOnly Flag:** {cookie.get("httpOnly", False)}  
+                **Secure Flag:** {cookie.get("secure", False)}  
+                **SameSite Attribute:** {cookie.get("sameSite", "Unknown")}  
+                """)
 
 elif page == "Per-Domain Data":
     st.subheader("Per-Domain Cookie Analysis")
@@ -273,7 +274,7 @@ elif page == "Per-Domain Data":
 
     with col2:
         domain_data = next((item for item in cookie_data if item["domain"] == selected), None)
-        if domain_data:
+        if domain_data and domain_data.get("cookies"):
             filtered = [domain_data]
             exp, http, sec, same = get_metrics(filtered)
 
@@ -282,7 +283,7 @@ elif page == "Per-Domain Data":
             plot_stacked_bar(sec, "Secure Flag", secure_colors, secure_order)
             plot_stacked_bar(same, "SameSite Attribute", samesite_colors, samesite_order)
         else:
-            st.write("No cookie data available for this domain.")
+            st.write("No cookies.")
 
 elif page == "Website Checker":
     st.subheader("Check Cookies for a Specific Website")
@@ -301,15 +302,12 @@ elif page == "Website Checker":
 
                 if "error" in data:
                     st.error(f"Error: {data['error']}")
+                elif not data.get("cookies"):
+                    st.write("No cookies.")
                 else:
                     st.success(f"Cookies from {domain}")
-                    #st.json(data["cookies"])
 
-                    # Score and display results
                     scores = score_cookies(domain, data["cookies"])
-                    #st.write("Scores:", scores)
-
-                    # Pie chart visualization
                     score_counts = categorize_scores(scores)
                     pie_labels = list(score_counts.keys())
                     pie_values = list(score_counts.values())
@@ -326,7 +324,6 @@ elif page == "Website Checker":
                     ax1.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
                     st.pyplot(fig1)
 
-                    # Attribute breakdowns
                     fetched_data = [{"domain": domain, "cookies": data["cookies"]}]
                     exp, http, sec, same = get_metrics(fetched_data)
                     plot_stacked_bar(exp, "Expiration Duration", expiration_colors, expiration_order)
