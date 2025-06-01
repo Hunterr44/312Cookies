@@ -254,23 +254,28 @@ elif page == "Per-Domain Data":
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        domain_scores = dict(score_map).get(selected, [])
-        score_counts = categorize_scores(domain_scores)
-        pie_labels = list(score_counts.keys())
-        pie_values = list(score_counts.values())
 
-        fig, ax = plt.subplots(figsize=(3, 3))
-        wedges, _ = ax.pie(
-            pie_values,
-            labels=None,
-            startangle=90,
-            colors=pie_colors,
-            wedgeprops=dict(width=0.3, edgecolor='white')
-        )
+        domain_data = next((item for item in cookie_data if item["domain"] == selected), None)
+        if domain_data and domain_data.get("cookies"):
+            domain_scores = dict(score_map).get(selected, [])
+            score_counts = categorize_scores(domain_scores)
+            pie_labels = list(score_counts.keys())
+            pie_values = list(score_counts.values())
 
-        ax.set(aspect="equal")
-        ax.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
-        st.pyplot(fig)
+            fig, ax = plt.subplots(figsize=(3, 3))
+            wedges, _ = ax.pie(
+                pie_values,
+                labels=None,
+                startangle=90,
+                colors=pie_colors,
+                wedgeprops=dict(width=0.3, edgecolor='white')
+            )
+
+            ax.set(aspect="equal")
+            ax.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
+            st.pyplot(fig)
+        else:
+            st.write("No cookies.")
 
     with col2:
         domain_data = next((item for item in cookie_data if item["domain"] == selected), None)
@@ -326,7 +331,7 @@ elif page == "Website Checker":
                         ax1.set(aspect="equal")
                         ax1.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
                         st.pyplot(fig1)
-                        
+
                     with col2:
                         fetched_data = [{"domain": domain, "cookies": data["cookies"]}]
                         exp, http, sec, same = get_metrics(fetched_data)
