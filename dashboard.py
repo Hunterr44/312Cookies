@@ -343,7 +343,12 @@ elif page == "Website Checker":
             except Exception as e:
                 st.error(f"Something went wrong: {str(e)}")
 
+
+
 elif page == "Data Explanation":
+
+    st.write("DEBUG - reached data explanation page")
+
     st.subheader("Expiration Duration")
     st.markdown("""
     The **Expiration** or **Max-Age** attribute of a cookie defines how long the cookie remains valid.
