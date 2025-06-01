@@ -274,8 +274,6 @@ elif page == "Per-Domain Data":
             ax.set(aspect="equal")
             ax.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
             st.pyplot(fig)
-        else:
-            st.write("No cookies.")
 
     with col2:
         domain_data = next((item for item in cookie_data if item["domain"] == selected), None)
