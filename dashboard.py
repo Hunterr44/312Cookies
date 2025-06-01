@@ -274,6 +274,8 @@ elif page == "Per-Domain Data":
             ax.set(aspect="equal")
             ax.text(0, 0, str(sum(pie_values)), ha='center', va='center', fontsize=28, color='dimgray')
             st.pyplot(fig)
+        else:
+            st.write("This website collects no cookie data.")
 
     with col2:
         domain_data = next((item for item in cookie_data if item["domain"] == selected), None)
@@ -285,8 +287,8 @@ elif page == "Per-Domain Data":
             plot_stacked_bar(http, "HttpOnly Flag", http_only_colors, http_only_order)
             plot_stacked_bar(sec, "Secure Flag", secure_colors, secure_order)
             plot_stacked_bar(same, "SameSite Attribute", samesite_colors, samesite_order)
-        else:
-            st.write("No cookies.")
+        
+            
 
 elif page == "Website Checker":
     st.subheader("Check Cookies for a Specific Website")
@@ -306,7 +308,7 @@ elif page == "Website Checker":
                 if "error" in data:
                     st.error(f"Error: {data['error']}")
                 elif not data.get("cookies"):
-                    st.write("No cookies.")
+                    st.write("This website collects no cookie data.")
                 else:
                     col1, col2 = st.columns([1, 2])
 
@@ -340,3 +342,51 @@ elif page == "Website Checker":
 
             except Exception as e:
                 st.error(f"Something went wrong: {str(e)}")
+
+elif page == "Data Explanation":
+    st.subheader("Expiration Duration")
+    st.markdown("""
+    The **Expiration** or **Max-Age** attribute of a cookie defines how long the cookie remains valid.
+    - **Session cookies** are temporary and are deleted when the browser is closed.
+    - **Persistent cookies** remain on the user’s device until the expiration date is reached.
+    
+    Security risk: Persistent cookies increase the window of opportunity for theft if not properly secured.
+    """)
+
+    st.subheader("HttpOnly Flag")
+    st.markdown("""
+    The **HttpOnly** attribute, when set, prevents client-side scripts (e.g., JavaScript) from accessing the cookie.
+    
+    Security benefit: Helps mitigate the risk of **Cross-Site Scripting (XSS)** attacks by denying access to cookies via `document.cookie`.
+    """)
+
+    st.subheader("Secure Flag")
+    st.markdown("""
+    The **Secure** attribute ensures that the cookie is only transmitted over **HTTPS** connections.
+    
+    Security benefit: Protects cookies from being exposed in **plain-text HTTP traffic**, reducing risk from **man-in-the-middle (MITM)** attacks.
+    """)
+
+    st.subheader("SameSite Attribute")
+    st.markdown("""
+    The **SameSite** attribute restricts how cookies are sent with cross-site requests:
+    
+    - `Strict`: Cookie only sent for same-site requests.
+    - `Lax`: Cookie sent for same-site requests and top-level navigations.
+    - `None`: Cookie sent with all requests (must be used with `Secure`).
+    
+    Security benefit: Helps defend against **Cross-Site Request Forgery (CSRF)** attacks by limiting when cookies are sent automatically.
+    """)
+
+    # footer with citation of information source
+    st.markdown("---")
+    st.markdown(
+        """
+        <div style='text-align: center; font-size: 0.85em; color: gray;'>
+            Source: <a href='https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/02-Testing_for_Cookies_Attributes' target='_blank'>Information courtesy of OWASP Web Security Testing Guide</a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    
